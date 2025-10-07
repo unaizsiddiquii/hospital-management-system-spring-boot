@@ -15,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -23,7 +22,8 @@ public class WebSecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/doctors/**").hasAnyRole("DOCTOR", "ADMIN")
                 ).formLogin(Customizer.withDefaults());
         return httpSecurity.build();
     }
@@ -35,11 +35,11 @@ public class WebSecurityConfig {
                 .roles("ADMIN")
                 .build();
 
-        UserDetails user2 = User.withUsername("doctors")
-                .password(passwordEncoder.encode("doc"))
-                .roles("DOCTORS")
-                .build();
+//        UserDetails user2 = User.withUsername("doctors")
+//                .password(passwordEncoder.encode("doc"))
+//                .roles("DOCTORS")
+//                .build();
 
-        return new InMemoryUserDetailsManager(user1, user1);
+        return new InMemoryUserDetailsManager(user1);
     }
 }
